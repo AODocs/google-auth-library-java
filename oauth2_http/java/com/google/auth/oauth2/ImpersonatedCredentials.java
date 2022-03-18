@@ -50,6 +50,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -518,6 +519,13 @@ public class ImpersonatedCredentials extends GoogleCredentials
         && Objects.equals(this.lifetime, other.lifetime)
         && Objects.equals(this.transportFactoryClassName, other.transportFactoryClassName)
         && Objects.equals(this.quotaProjectId, other.quotaProjectId);
+  }
+  
+  @SuppressWarnings("unused")
+  private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+    // properly deserialize the transient transportFactory
+    input.defaultReadObject();
+    transportFactory = newInstance(transportFactoryClassName);
   }
 
   public Builder toBuilder() {
